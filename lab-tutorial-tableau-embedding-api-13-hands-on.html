@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My embedded Tableau visualization</title>
+    <style>
+      html, body, tableau-viz, tableau-authoring-viz, tableau-pulse {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <h1>Tableau Embedding API - Applying Filters Example</h1>
+    </div>
+    <tableau-viz
+      src="https://public.tableau.com/views/DeveloperSuperstore/Overview"
+      device="desktop"
+      width="600"
+      height="400"
+      hide-tabs
+      toolbar="hidden"
+    >
+    </tableau-viz>
+    <script type="module">
+      import { FilterUpdateType, TableauEventType } from 'https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.js';
+      (async () => {
+        // Get the viz object from the HTML web component
+        const viz = document.querySelector('tableau-viz');
+
+        // Wait for the viz to become interactive
+        await new Promise((resolve, reject) => {
+          // Add an event listener to verify the viz becomes interactive
+          viz.addEventListener(TableauEventType.FirstInteractive, () => {
+            console.log('Viz is interactive!');
+            resolve();
+          });
+        });
+
+        // Make the Overview dashboard the active sheet
+        const dashboard = await viz.workbook.activateSheetAsync('Overview');
+
+        // Get the worksheet we want to use
+        const worksheet = dashboard.worksheets.find((ws) => ws.name === 'SaleMap');
+
+        // *** Insert your code below! ***
+        try {
+          // Apply categorical filter (Worksheet)
+
+          // snippet selects the worksheet "SaleMap" and applies a categorical filter on "Region"
+
+          // For more information, see
+          // https://help.tableau.com/current/api/embedding_api/en-us/docs/embedding_api_filter.html
+
+          // Apply the filter on Region to the "SaleMap" worksheet
+          const filterName = await worksheet.applyFilterAsync(
+            'Region', // the name of the filter
+            ['West'], // array of values
+            FilterUpdateType.Replace // other options Add, Remove or All
+          );
+        } catch (e) {
+          console.error(e.toString());
+        }
+      })();
+    </script>  
+  </body>
+</html>
